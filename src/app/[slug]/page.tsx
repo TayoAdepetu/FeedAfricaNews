@@ -2,6 +2,7 @@ import { PortableText, type SanityDocument } from "next-sanity";
 import imageUrlBuilder from "@sanity/image-url";
 import type { SanityImageSource } from "@sanity/image-url";
 import { client } from "@/sanity/client";
+import { components } from "@/components/portable-text";
 import Link from "next/link";
 
 const POST_QUERY = `*[_type == "post" && slug.current == $slug][0]`;
@@ -20,8 +21,8 @@ export default async function PostPage({
     params: Promise<{ slug: string }>;
 }) {
     const post = await client.fetch<SanityDocument>(POST_QUERY, await params, options);
-    const postImageUrl = post.image
-        ? urlFor(post.image)?.width(550).height(310).url()
+    const postImageUrl = post.mainImage
+        ? urlFor(post.mainImage)?.width(550).height(310).url()
         : null;
 
     return (
@@ -33,7 +34,7 @@ export default async function PostPage({
                 <img
                     src={postImageUrl}
                     alt={post.title}
-                    className="aspect-video rounded-xl"
+                    className="w-full aspect-video rounded-xl"
                     width="550"
                     height="310"
                 />
@@ -41,7 +42,7 @@ export default async function PostPage({
             <h1 className="text-4xl font-bold mb-8">{post.title}</h1>
             <div className="prose">
                 <p>Published: {new Date(post.publishedAt).toLocaleDateString()}</p>
-                {Array.isArray(post.body) && <PortableText value={post.body} />}
+                {Array.isArray(post.body) && <PortableText value={post.body} components={components} />}
             </div>
         </main>
     );
